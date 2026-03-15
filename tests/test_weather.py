@@ -74,7 +74,7 @@ def test_cli_exits_nonzero_for_unknown_city(httpx_mock: HTTPXMock):
 
 def test_cli_handles_multi_word_city(httpx_mock: HTTPXMock):
     httpx_mock.add_response(
-        url=re.compile(r"https://geocoding-api\.open-meteo\.com.*name=New"),
+        url="https://geocoding-api.open-meteo.com/v1/search?name=New+York&count=1&language=en&format=json",
         json={"results": [{"name": "New York", "latitude": 40.7128, "longitude": -74.0060}]},
     )
     httpx_mock.add_response(
@@ -83,4 +83,5 @@ def test_cli_handles_multi_word_city(httpx_mock: HTTPXMock):
     )
     result = runner.invoke(app, ["New York"])
     assert result.exit_code == 0
+    assert "New York" in result.output
     assert "3.7" in result.output
