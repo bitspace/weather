@@ -33,3 +33,24 @@ def get_temperature(lat: float, lon: float) -> float:
     response.raise_for_status()
     data = response.json()
     return data["current"]["temperature_2m"]
+
+
+import typer
+
+app = typer.Typer()
+
+
+@app.command()
+def main(city: str = typer.Argument(..., help="City name to look up")):
+    """Print the current temperature for CITY."""
+    try:
+        lat, lon = get_coordinates(city)
+        temp = get_temperature(lat, lon)
+        typer.echo(f"{city}: {temp}°C")
+    except ValueError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=1)
+
+
+if __name__ == "__main__":
+    app()
