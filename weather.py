@@ -1,4 +1,5 @@
 import httpx
+import typer
 
 GEOCODING_URL = "https://geocoding-api.open-meteo.com/v1/search"
 
@@ -34,8 +35,6 @@ def get_temperature(lat: float, lon: float) -> float:
     data = response.json()
     return data["current"]["temperature_2m"]
 
-
-import typer
 
 app = typer.Typer()
 
