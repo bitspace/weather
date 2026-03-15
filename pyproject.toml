@@ -1,7 +1,7 @@
 [project]
 name = "weather"
 version = "0.1.0"
-description = "Add your description here"
+description = "CLI tool to fetch current temperature for any city"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
