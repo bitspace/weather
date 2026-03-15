@@ -49,6 +49,15 @@ def main(city: str = typer.Argument(..., help="City name to look up")):
     except ValueError as exc:
         typer.echo(str(exc), err=True)
         raise typer.Exit(code=1)
+    except httpx.ConnectError as exc:
+        typer.echo(f"Network error: {exc}", err=True)
+        raise typer.Exit(code=1)
+    except httpx.TimeoutException:
+        typer.echo("Network error: Request timed out", err=True)
+        raise typer.Exit(code=1)
+    except httpx.HTTPStatusError as exc:
+        typer.echo(f"Network error: API returned {exc.response.status_code}", err=True)
+        raise typer.Exit(code=1)
 
 
 if __name__ == "__main__":

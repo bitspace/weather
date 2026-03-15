@@ -85,3 +85,33 @@ def test_cli_handles_multi_word_city(httpx_mock: HTTPXMock):
     assert result.exit_code == 0
     assert "New York" in result.output
     assert "3.7" in result.output
+
+
+def _combined(result) -> str:
+    return result.output + (result.stderr if hasattr(result, "stderr") and result.stderr else "")
+
+
+def test_cli_network_connect_error(httpx_mock: HTTPXMock):
+    httpx_mock.add_exception(httpx.ConnectError("Connection refused"))
+    result = runner.invoke(app, ["London"])
+    assert result.exit_code != 0
+    assert "network error" in _combined(result).lower()
+
+
+def test_cli_network_timeout(httpx_mock: HTTPXMock):
+    httpx_mock.add_exception(httpx.TimeoutException("Request timed out"))
+    result = runner.invoke(app, ["London"])
+    assert result.exit_code != 0
+    assert "network error" in _combined(result).lower()
+
+
+def test_cli_api_server_error(httpx_mock: HTTPXMock):
+    httpx_mock.add_response(
+        url="https://geocoding-api.open-meteo.com/v1/search?name=London&count=1&language=en&format=json",
+        status_code=503,
+    )
+    result = runner.invoke(app, ["London"])
+    assert result.exit_code != 0
+    combined = _combined(result)
+    assert "network error" in combined.lower()
+    assert "503" in combined
